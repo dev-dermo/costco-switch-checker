@@ -1,0 +1,1 @@
+# costco-switch-checker
