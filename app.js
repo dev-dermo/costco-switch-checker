@@ -14,10 +14,12 @@ switch (process.argv[2]) {
 	case 'sanity':
 		productUrl = testUrl; // product that was in stock at time of testing, for testing purposes.
 		intervalTime = 10000;
+		console.log(chalk.gray.bgYellow(`About to run a sanity check.`));
 		break;
 	case 'safetest':
 		productUrl = safeTest;
 		intervalTime = 2500;
+		console.log(chalk.gray.bgYellow(`About to run a generic test ${safeTest}.`));
 		break;
 	case 'runforreal':
 		productUrl = 'https://www.costco.com/nintendo-switch-bundle-with-12-month-online-family-plan-and-case.product.100519747.html';

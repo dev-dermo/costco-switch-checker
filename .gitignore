@@ -1,4 +1,6 @@
 node_modules/
+archive/
+
 costco-response.html
 server-old.log
 app.log
