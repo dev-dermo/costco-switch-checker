@@ -47,6 +47,7 @@ app.get('/checkcostco/:test?', (req, res) => {
 			});
 		}).catch((err) => {
 			console.error(`Uh-oh, looks like there was an error. Message: ${err}`);
+			res.send(err)
 		});
 
 	// lol instant 403 response when I ran this
