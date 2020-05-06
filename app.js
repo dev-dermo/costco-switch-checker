@@ -1,71 +1,58 @@
 require('dotenv').config();
 const fs = require('fs');
-const express = require('express');
 const axios = require('axios');
-const morgan = require('morgan');
+const chalk = require('chalk');
 
-const app = express();
+let productUrl;
+let intervalTime;
 
-const PORT = process.env.PORT || 3000;
-
-app.use(morgan('combined', {
-	stream: fs.createWriteStream('server.log', { flags: 'a' })
-}));
-
-let productUrl = 'https://www.costco.com/nintendo-switch-bundle-with-12-month-online-family-plan-and-case.product.100519747.html';
 const testUrl = 'https://www.costco.com/springfield-club-chair.product.11659957.html'; // product that was in stock at time of testing, for testing purposes.
+const safeTest = 'http://diarmuidmurphy.com/'
 const inStockString = '<img class="oos-overlay hide" src="/wcsstore/CostcoGLOBALSAS/images/OOS-overlay-en.png" alt="Out of Stock" title="Out of Stock"/>'; // a string only found on the page when it IS in stock
 
-app.get('/', (req, res) => {
-	let html = '<p>App up and running, go ';
-	html += '<a href="/checkcostco">here</a>'
-	html += ' to run <strong>Costco Switch Checker</strong>.'
-	res.send(html);
-});
+switch (process.argv[2]) {
+	case 'sanity':
+		productUrl = testUrl; // product that was in stock at time of testing, for testing purposes.
+		intervalTime = 10000;
+		break;
+	case 'safetest':
+		productUrl = safeTest;
+		intervalTime = 2500;
+		break;
+	case 'runforreal':
+		productUrl = 'https://www.costco.com/nintendo-switch-bundle-with-12-month-online-family-plan-and-case.product.100519747.html';
+		intervalTime = 30*60*1000;
+		break;
+	default:
+		return console.log('Invalid operation argument.');
+}
 
-app.get('/checkcostco/:test?', (req, res) => {
-	if (req.params.test) {
-		console.log(`Running test request against product that should be in stock.`);
-		productUrl = testUrl;
-	}
-
+const repeatedRequest = () => {
 	axios.get(productUrl)
 		.then((response) => {
 			console.log(`Request happened sucessfully to ${productUrl}`);
-			// console.log(Object.keys(response));
+
+			fs.writeFile('costco-response.html', response.data, (err) => { if (err) { throw err } });
 
 			const now = new Date();
 
-			response.data.includes(inStockString) ?
-				res.send('Looks like the Nintendo Switch is back in stock!') :
-				res.send(`Alas, still out of stock :( @ ${now.toLocaleString()}`);
+			if (response.data.includes(inStockString)) {
+				const msg = `Looks like the Nintendo Switch is back in stock! @ ${now}\r\n`;
+				console.log(chalk.gray.bgGreen(msg));
+				fs.appendFile('app.log', msg, (err) => { if (err) throw err; });
+			} else {
+				const msg = `Alas, still out of stock :( @ ${now.toLocaleString()}\r\n`;
+				console.log(chalk.bgRed(msg));
+				fs.appendFile('app.log', msg, (err) => { if (err) throw err; });
+			}
 
-			fs.writeFile('costco-response.html', response.data, function (err) {
-				if (err) { throw err }
+			const nextScheduled = new Date(now.getTime() + 30*60*1000);
 
-				console.log('Response from Costco website written to costco-response.html file.');
-			});
+			console.log(`Next check scheduled for ${nextScheduled}`);
+
 		}).catch((err) => {
 			console.error(`Uh-oh, looks like there was an error. Message: ${err}`);
-			res.send(err)
 		});
-
-	// lol instant 403 response when I ran this
-	// const makeRequest = () => {
-	// 	axios.get(`http://localhost:${PORT}/checkcostco`)
-	// 		.then((response) => {
-	// 			console.log('Request itself');
-	// 		})
-	// 		.catch((err) => {
-	// 			console.log(`Didn't like that! Error: ${err}`);
-	// 		});
-	// };
-
-	// setInterval(makeRequest, 5000);
-
-
-});
-
-app.listen(PORT, () => {
-	console.log(`App listening on PORT: ${PORT}`);
-});
+};
+repeatedRequest();
+setInterval(repeatedRequest, intervalTime);

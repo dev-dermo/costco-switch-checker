@@ -1,6 +1,7 @@
 node_modules/
-.env
 costco-response.html
-server.log
+server-old.log
+app.log
+app-old.js
 
 .DS_Store

@@ -24,9 +24,7 @@
   "homepage": "https://github.com/diarmuid-murphy/costco-switch-checker#readme",
   "dependencies": {
     "axios": "^0.19.2",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "morgan": "^1.10.0",
+    "chalk": "^4.0.0",
     "nodemon": "^2.0.3"
   }
 }
