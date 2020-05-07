@@ -2,6 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const axios = require('axios');
 const chalk = require('chalk');
+const player = require('play-sound')(opts = {});
 
 let productUrl;
 let intervalTime;
@@ -33,6 +34,7 @@ const repeatedRequest = () => {
 	axios.get(productUrl)
 		.then((response) => {
 			console.log(`Request happened sucessfully to ${productUrl}`);
+			player.play('juntos.mp3', (err) => { if (err) { throw err } });
 
 			fs.writeFile('costco-response.html', response.data, (err) => { if (err) { throw err } });
 
