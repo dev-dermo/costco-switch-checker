@@ -34,7 +34,7 @@ const repeatedRequest = () => {
 	axios.get(productUrl)
 		.then((response) => {
 			console.log(`Request happened sucessfully to ${productUrl}`);
-			player.play('juntos.mp3', (err) => { if (err) { throw err } });
+			player.play('juntos.mp3', (err) => { if (err) { return err } });
 
 			fs.writeFile('costco-response.html', response.data, (err) => { if (err) { throw err } });
 
