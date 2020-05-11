@@ -47,7 +47,7 @@ const repeatedRequest = () => {
 					console.log(chalk.gray.bgGreen(msg));
 					fs.appendFile('app.log', msg, (err) => { if (err) throw err; });
 				} else {
-					const msg = `Alas, still out of stock :( @ ${now.toLocaleString()}`;
+					const msg = `\r\nAlas, still out of stock :( @ ${now.toLocaleString()}`;
 					console.log(chalk.bgRed(msg));
 					fs.appendFile('app.log', msg, (err) => { if (err) throw err; });
 				}
@@ -55,7 +55,7 @@ const repeatedRequest = () => {
 				const nextScheduled = new Date(now.getTime() + 30*60*1000);
 	
 				console.log(`Next check scheduled for ${nextScheduled}`);
-				console.log('\r\n--------------------------------------------------------------------\r\n');
+				console.log('\r\n--------------------------------------------------------------------');
 			});
 		}).catch((err) => {
 			console.error(`Uh-oh, looks like there was an error. Message: ${err}`);
